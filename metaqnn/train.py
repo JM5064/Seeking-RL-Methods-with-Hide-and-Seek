@@ -11,11 +11,13 @@ def validate(model, val_loader):
     with torch.no_grad():
         for inputs, labels in val_loader:
             inputs = inputs.to(DEVICE)
-            labels = inputs.to(DEVICE)
+            labels = labels.to(DEVICE)
 
             preds = model(inputs)
 
-            num_correct += (preds == labels).sum()
+            pred_classes = preds.argmax(dim=1)
+
+            num_correct += (pred_classes == labels).sum().item()
             num_total += len(labels)
 
     accuracy = num_correct / num_total
@@ -31,7 +33,7 @@ def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, sch
         model.train()
         for inputs, labels in train_loader:
             inputs = inputs.to(DEVICE)
-            labels = inputs.to(DEVICE)
+            labels = labels.to(DEVICE)
 
             optimizer.zero_grad()
 
