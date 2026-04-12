@@ -24,7 +24,6 @@ class MetaQNN(nn.Module):
                     in_channels=current_channels, 
                     out_channels=layer_config['out_channels'],
                     kernel_size=layer_config['kernel_size'],
-                    stride=layer_config['stride'],
                     layer_depth=i,
                     representation_size=current_resolution
                 )

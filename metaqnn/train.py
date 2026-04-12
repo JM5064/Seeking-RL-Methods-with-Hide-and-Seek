@@ -47,9 +47,9 @@ def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, sch
         if epoch == 0:
             accuracy = validate(model, val_loader)
 
-            # Model is worse than random chance
+            # Model is similar to random chance
             # TODO: restart it a few times if this happens
-            if accuracy <= 0.1:
+            if accuracy <= 0.15:
                 return accuracy
 
         # Step scheduler
