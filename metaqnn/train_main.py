@@ -37,8 +37,8 @@ def main():
 
 
     layer_configs = [
-        { 'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3, 'stride' : 1},
-        { 'layer_type': 'convolution', 'out_channels' : 4, 'kernel_size' : 3, 'stride' : 1},
+        { 'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3},
+        { 'layer_type': 'convolution', 'out_channels' : 4, 'kernel_size' : 3},
         { 'layer_type': 'termination' }
     ]
     model = MetaQNN(layer_configs=layer_configs, input_size=32, input_channels=3)

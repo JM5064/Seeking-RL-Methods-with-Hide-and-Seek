@@ -30,7 +30,7 @@ class MetaQNN(nn.Module):
                     representation_size=current_resolution
                 )
                 current_channels = layer_config['out_channels']
-                current_resolution = (current_resolution - layer_config['kernel_size']) // layer_config['stride'] + 1
+                current_resolution = (current_resolution - layer_config['kernel_size']) + 1
                 num_consecutive_fc_layers = 0
 
             elif layer_type == POOLING:
