@@ -1,6 +1,7 @@
 import torch.nn as nn
 import math
 
+from metaqnn.rl_config import *
 from metaqnn.layers.convolution import Convolution
 from metaqnn.layers.pooling import Pooling
 from metaqnn.layers.fully_connected import FullyConnected
@@ -19,7 +20,8 @@ class MetaQNN(nn.Module):
         num_consecutive_fc_layers = 0
 
         for i, layer_config in enumerate(layer_configs):
-            if layer_config['layer_type'] == 'convolution':
+            layer_type = layer_config['layer_type']
+            if layer_type == CONVOLUTION:
                 layer = Convolution(
                     in_channels=current_channels, 
                     out_channels=layer_config['out_channels'],
@@ -28,20 +30,20 @@ class MetaQNN(nn.Module):
                     representation_size=current_resolution
                 )
                 current_channels = layer_config['out_channels']
-                current_resolution = math.floor((current_resolution - layer_config['kernel_size']) / layer_config['stride']) + 1
+                current_resolution = (current_resolution - layer_config['kernel_size']) // layer_config['stride'] + 1
                 num_consecutive_fc_layers = 0
 
-            elif layer_config['layer_type'] == 'pooling':
+            elif layer_type == POOLING:
                 layer = Pooling(
                     kernel_size=layer_config['kernel_size'],
                     stride=layer_config['stride'],
                     layer_depth=i,
                     representation_size=current_resolution
                 )
-                current_resolution = math.floor((current_resolution - layer_config['kernel_size']) / layer_config['stride']) + 1
+                current_resolution = (current_resolution - layer_config['kernel_size']) // layer_config['stride'] + 1
                 num_consecutive_fc_layers = 0
 
-            elif layer_config['layer_type'] == 'fully_connected':
+            elif layer_type == FULLY_CONNECTED:
                 # If first FC layer, flatten input
                 if num_consecutive_fc_layers == 0:
                     in_features = current_channels * current_resolution * current_resolution

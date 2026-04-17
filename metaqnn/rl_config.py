@@ -1,0 +1,22 @@
+GAMMA = 1.0
+INITIAL_Q_VALUE = 0.5
+
+# Maximum number of layers
+MAX_DEPTH = 8
+
+
+# Indices for layer types
+CONVOLUTION = 0
+POOLING = 1
+FULLY_CONNECTED = 2
+TERMINATION = 3
+
+
+# Available parameter values
+AVAIL_KERNEL_SIZES = [1, 3, 5]
+AVAIL_NUM_CHANNELS = [64, 128, 256, 512]
+
+AVAIL_KERNEL_SIZE_STRIDES = [(5, 3), (3, 2), (2, 2)]
+
+AVAIL_NUM_NEURONS = [128, 256, 512]
+MAX_CONSECUTIVE_FC = 2
