@@ -9,8 +9,9 @@ from torchvision.transforms import v2
 from sklearn.model_selection import train_test_split
 import torchvision
 
-from metaqnn.train import train
+from metaqnn.train import train, get_scheduler
 from metaqnn.metaqnn import MetaQNN
+from metaqnn.config.rl_config import *
 from metaqnn.config.train_config import DEVICE
 
 
@@ -37,9 +38,9 @@ def main():
 
 
     layer_configs = [
-        { 'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3},
-        { 'layer_type': 'convolution', 'out_channels' : 4, 'kernel_size' : 3},
-        { 'layer_type': 'termination' }
+        { 'layer_type': CONVOLUTION, 'out_channels' : 64, 'kernel_size' : 3, 'layer_depth': 1, 'representation_size': 32},
+        { 'layer_type': CONVOLUTION, 'out_channels' : 64, 'kernel_size' : 3, 'layer_depth': 2, 'representation_size': 32},
+        { 'layer_type': TERMINATION }
     ]
     model = MetaQNN(layer_configs=layer_configs, input_size=32, input_channels=3)
     model = model.to(DEVICE)
@@ -51,12 +52,10 @@ def main():
         "eps": 1e-8
     }
     optimizer = optim.AdamW(model.parameters(), **adamW_params)
+    scheduler = get_scheduler(optimizer)
 
-    train(model=model, num_epochs=20, train_loader=train_loader, val_loader=val_loader, 
-          loss_func=nn.CrossEntropyLoss(), optimizer=optimizer, scheduler=None)
-
-    
-
+    train(model=model, num_epochs=15, train_loader=train_loader, val_loader=val_loader, 
+          loss_func=nn.CrossEntropyLoss(), optimizer=optimizer, scheduler=scheduler)
 
 
 if __name__ == "__main__":

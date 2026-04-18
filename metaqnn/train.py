@@ -8,7 +8,7 @@ from torchvision.transforms import v2
 from sklearn.model_selection import train_test_split
 import torchvision
 
-from metaqnn.config.train_config import DEVICE
+from metaqnn.config.train_config import DEVICE, IMAGE_SIZE
 from metaqnn.metaqnn import MetaQNN
 from metaqnn.state_actions import parse_state
 
@@ -19,7 +19,7 @@ def validate(model, val_loader):
     num_total = 0
     
     with torch.no_grad():
-        for inputs, labels in val_loader:
+        for inputs, labels in tqdm(val_loader):
             inputs = inputs.to(DEVICE)
             labels = labels.to(DEVICE)
 
@@ -39,9 +39,10 @@ def validate(model, val_loader):
 
 def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, scheduler):
     # Training loop
-    for epoch in tqdm(range(num_epochs)):
+    for epoch in range(num_epochs):
+        print(f"Epoch {epoch+1}")
         model.train()
-        for inputs, labels in train_loader:
+        for inputs, labels in tqdm(train_loader):
             inputs = inputs.to(DEVICE)
             labels = labels.to(DEVICE)
 
@@ -54,7 +55,7 @@ def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, sch
             optimizer.step()
 
         # Evaluate model on first epoch
-        if epoch == 0:
+        if epoch >= 0:
             accuracy = validate(model, val_loader)
 
             # Model is similar to random chance
@@ -65,6 +66,7 @@ def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, sch
         # Step scheduler
         if scheduler:
             scheduler.step()
+
 
     # Evaluate model
     accuracy = validate(model, val_loader)
@@ -96,12 +98,10 @@ def initialize_datasets():
     return train_loader, val_loader, test_loader
 
 
-def create_model(state_sequence):
-    # Convert state strings to objects
+def create_model(action_sequence):
     # Start from 1 to ignore the 'None' initial state
-    layer_configs = [parse_state(state_sequence[i]) for i in range(1, len(state_sequence))]
-
-    model = MetaQNN(layer_configs=layer_configs, input_channels=3)
+    model = MetaQNN(layer_configs=action_sequence[1:], input_size=IMAGE_SIZE, input_channels=3)
+    model = model.to(DEVICE)
 
     return model
 
@@ -118,5 +118,6 @@ def get_optimizer(model):
     return optimizer
 
 
-def get_scheduler():
-    pass
+def get_scheduler(optimizer):
+    # Multiply LR by 0.2 every 5 epochs
+    return optim.lr_scheduler.StepLR(optimizer, 5, 0.2)

@@ -1,7 +1,7 @@
 GAMMA = 1.0
 ALPHA = 0.01
 INITIAL_Q_VALUE = 0.5
-REPLAY_NUMBER = 128
+REPLAY_NUMBER = 64
 
 # Maximum number of layers
 MAX_DEPTH = 8

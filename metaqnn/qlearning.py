@@ -7,10 +7,13 @@ from metaqnn.config.train_config import *
 from metaqnn.state_actions import get_action_values, to_string, parse_state
 from metaqnn.state_actions import load_Q, save_Q, load_buffer, save_buffer
 
-from metaqnn.train import train, initialize_datasets, create_model, get_optimizer
+from metaqnn.train import train, initialize_datasets, create_model, get_optimizer, get_scheduler
 
 
-def q_learning(num_episodes, Q_file_path=None, buffer_file_path=None):
+Q_file_path = 'metaqnn/saves/Q_values.json'
+buffer_file_path = 'metaqnn/saves/replay_buffer.pkl'
+
+def q_learning(num_episodes):
     # Initialize Q and replay buffer
     Q = load_Q(Q_file_path)
     replay_buffer = load_buffer(buffer_file_path)
@@ -18,14 +21,21 @@ def q_learning(num_episodes, Q_file_path=None, buffer_file_path=None):
     # Initialize datasets
     train_loader, val_loader, _ = initialize_datasets()
 
+    print("Initialized Q, replay buffer, and datasets")
+
     for _ in range(num_episodes):
         S, U = sample_new_network(Q, epsilon=0.3)   # TODO: update epsilon
-        model = create_model(S)
+        model = create_model(U)
         optimizer = get_optimizer(model)
+        scheduler = get_scheduler(optimizer)
+
+        print("Sampled network:")
+        for layer in U:
+            print(layer)
 
         accuracy = train(
             model, num_epochs=NUM_EPOCHS, train_loader=train_loader, val_loader=val_loader,
-            loss_func=nn.CrossEntropyLoss(), optimizer=optimizer, scheduler=None
+            loss_func=nn.CrossEntropyLoss(), optimizer=optimizer, scheduler=scheduler
         )
 
         replay_buffer.append((S, U, accuracy))
@@ -36,6 +46,10 @@ def q_learning(num_episodes, Q_file_path=None, buffer_file_path=None):
 
             # Update Q values
             Q = update_Q_values(Q, S_sample, U_sample, accuracy_sample)
+
+        # Save new Q values and buffer
+        save_Q(Q, Q_file_path)
+        save_buffer(replay_buffer, buffer_file_path)
 
 
 def sample_new_network(Q, epsilon):
@@ -98,9 +112,8 @@ def update_Q_values(Q, S, U, accuracy):
 
         next_state = state
 
-    # Save Q
-
     return Q
 
 
 if __name__ == "__main__":
+    q_learning(5)

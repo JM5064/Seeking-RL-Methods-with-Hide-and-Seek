@@ -3,13 +3,10 @@ import torch.nn as nn
 
 class Pooling(nn.Module):
 
-    def __init__(self, kernel_size_stride, layer_depth, representation_size):
+    def __init__(self, kernel_size, stride):
         super().__init__()
 
-        self.layer_depth = layer_depth
-        self.representation_size = representation_size
-
-        self.pool = nn.MaxPool2d(kernel_size=kernel_size_stride[0], stride=kernel_size_stride[1])
+        self.pool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride)
 
 
     def forward(self, x):
