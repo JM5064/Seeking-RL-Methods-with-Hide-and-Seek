@@ -147,15 +147,15 @@ def save_Q(Q, file_path):
         ...
     }
     """
-    if not os.path.exists(file_path):
-        # If Q file path does not exist, return an empty one
-        return {}
-
     with open(file_path, 'w') as file:
         json.dump(Q, file, indent=4)
 
 
 def load_Q(file_path):
+    if file_path is None or not os.path.exists(file_path):
+        # If Q file path does not exist, return an empty one
+        return {}
+
     with open(file_path) as file:
         Q = json.load(file)
 
@@ -173,7 +173,7 @@ def save_buffer(replay_buffer, file_path):
 
 
 def load_buffer(file_path):
-    if not os.path.exists(file_path):
+    if file_path is None or not os.path.exists(file_path):
         # If buffer file path does not exist, return an empty one
         return deque()
 

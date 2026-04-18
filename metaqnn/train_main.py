@@ -7,11 +7,11 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision.transforms import v2
 from sklearn.model_selection import train_test_split
-
 import torchvision
+
 from metaqnn.train import train
 from metaqnn.metaqnn import MetaQNN
-from metaqnn.train_config import DEVICE
+from metaqnn.config.train_config import DEVICE
 
 
 def main():

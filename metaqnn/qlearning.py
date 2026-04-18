@@ -1,24 +1,44 @@
 import random
+import torch.nn as nn
+
 from metaqnn.config.rl_config import *
-from metaqnn.state_actions import get_action_values, to_string
+from metaqnn.config.train_config import *
+
+from metaqnn.state_actions import get_action_values, to_string, parse_state
+from metaqnn.state_actions import load_Q, save_Q, load_buffer, save_buffer
+
+from metaqnn.train import train, initialize_datasets, create_model, get_optimizer
 
 
-def q_learning(num_episodes):
-    # init replay buffer
-    # init Q
+def q_learning(num_episodes, Q_file_path=None, buffer_file_path=None):
+    # Initialize Q and replay buffer
+    Q = load_Q(Q_file_path)
+    replay_buffer = load_buffer(buffer_file_path)
 
-    for i in range(num_episodes):
-        # S, U = sample_new_network(epsilon=0.1, Q)
-        # accuracy = train(S)
+    # Initialize datasets
+    train_loader, val_loader, _ = initialize_datasets()
 
-        # replay memory.append((S, U, accuracy))
+    for _ in range(num_episodes):
+        S, U = sample_new_network(Q, epsilon=0.3)   # TODO: update epsilon
+        model = create_model(S)
+        optimizer = get_optimizer(model)
 
-        pass
+        accuracy = train(
+            model, num_epochs=NUM_EPOCHS, train_loader=train_loader, val_loader=val_loader,
+            loss_func=nn.CrossEntropyLoss(), optimizer=optimizer, scheduler=None
+        )
 
-    return
+        replay_buffer.append((S, U, accuracy))
+
+        for _ in range(REPLAY_NUMBER):
+            # Sample from replay buffer
+            S_sample, U_sample, accuracy_sample = random.choice(replay_buffer)
+
+            # Update Q values
+            Q = update_Q_values(Q, S_sample, U_sample, accuracy_sample)
 
 
-def sample_new_network(epsilon, Q):
+def sample_new_network(Q, epsilon):
     # Initialize state and action sequences
     state_sequence = [None]
     action_sequence = []
@@ -83,9 +103,4 @@ def update_Q_values(Q, S, U, accuracy):
     return Q
 
 
-def init_Q():
-    # Load Q if stored ?
-
-    Q = {}
-
-    return Q
+if __name__ == "__main__":
