@@ -123,7 +123,7 @@ def get_fully_connected_actions(num_consecutive, layer_depth, curr_num_neurons=N
     return fully_connected_actions
 
 
-def save_Q(Q):
+def save_Q(Q, Q_file_path):
     """
     Q looks like:
     dict {
@@ -143,12 +143,15 @@ def save_Q(Q):
         ...
     }
     """
-    with open('Q_values.json', 'w') as file:
-        json.dump(Q, file)
+    with open(Q_file_path, 'w') as file:
+        json.dump(Q, file, indent=4)
 
 
-def load_Q():
-    pass
+def load_Q(Q_file_path):
+    with open(Q_file_path) as file:
+        Q = json.load(file)
+
+    return Q
 
 
 def save_buffer(replay_buffer):
@@ -166,3 +169,18 @@ def to_string(state):
 def parse_state(state_string):
     return json.loads(state_string)
 
+
+if __name__ == "__main__":
+    Q = {
+        "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3}" : {
+            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3}" : 0.4,
+            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}" : 0.2,
+        },
+
+        "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}" : {
+            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3}" : 0.5,
+            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}" : 0.6
+        }
+    }
+
+    save_Q(Q, 'metaqnn/saves/Q_values.json')
