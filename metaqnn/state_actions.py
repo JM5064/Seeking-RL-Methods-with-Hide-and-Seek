@@ -18,7 +18,6 @@ def get_action_values(Q, state):
 
     layer_type = state['layer_type']
     layer_depth = state['layer_depth']
-    representation_size = state['representation_size']
 
     if layer_depth >= MAX_DEPTH:
         # If at max depth, must go to terminal state
@@ -26,21 +25,21 @@ def get_action_values(Q, state):
 
     elif layer_type is None:
         # If initial state, go to convolution, pooling, or FC
-        possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=representation_size))
-        possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=representation_size))
+        possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
+        possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
         possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, num_consecutive=0))
 
     elif layer_type == CONVOLUTION:
         # Convolution layers can go to any layer
-        possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=representation_size))
-        possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=representation_size))
+        possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
+        possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
         possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, num_consecutive=0))
         possible_actions.append({ 'layer_type' : TERMINATION })
 
     elif layer_type == POOLING:
         # Pooling layers can go to convolution, FC, or terminal
-        possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=representation_size))
-        possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=representation_size))
+        possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
+        possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
         possible_actions.append({ 'layer_type' : TERMINATION })
 
     elif layer_type == FULLY_CONNECTED:
@@ -121,7 +120,6 @@ def get_fully_connected_actions(num_consecutive, layer_depth, curr_num_neurons=N
             'num_neurons' : num_neurons, 
             'num_consecutive' : num_consecutive + 1,
             'layer_depth' : layer_depth + 1,
-            'representation_size': 1
         })
 
     return fully_connected_actions
@@ -192,33 +190,7 @@ def parse_state(state_string):
 
 
 if __name__ == "__main__":
-    Q = {
-        "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3}" : {
-            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3}" : 0.4,
-            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}" : 0.2,
-        },
-
-        "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}" : {
-            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3}" : 0.5,
-            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}" : 0.6
-        }
-    }
-
-    save_Q(Q, 'metaqnn/saves/Q_values.json')
-
-    replay_buffer = deque()
-
-    replay_buffer.append((
-        [
-            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3}",
-            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}"
-        ],
-        [
-            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}",
-            "{'layer_type': 'termination'}"
-        ],
-        0.7
-    ))
-
-    save_buffer(replay_buffer, 'metaqnn/saves/replay_buffer.pkl')
+    loaded_Q = load_Q('metaqnn/saves/Q_values.json')
     loaded_buffer = load_buffer('metaqnn/saves/replay_buffer.pkl')
+
+    print(loaded_Q)

@@ -52,7 +52,6 @@ class MetaQNN(nn.Module):
                     num_neurons=layer_config['num_neurons'],
                 )
                 current_channels = layer_config['num_neurons']
-                representation_size = layer_config['representation_size']
                 num_consecutive_fc_layers += 1
 
             else:

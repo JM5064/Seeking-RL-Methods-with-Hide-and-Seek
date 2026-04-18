@@ -55,7 +55,7 @@ def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, sch
             optimizer.step()
 
         # Evaluate model on first epoch
-        if epoch >= 0:
+        if epoch == 0:
             accuracy = validate(model, val_loader)
 
             # Model is similar to random chance

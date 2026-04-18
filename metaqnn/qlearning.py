@@ -24,7 +24,10 @@ def q_learning(num_episodes):
     print("Initialized Q, replay buffer, and datasets")
 
     for _ in range(num_episodes):
-        S, U = sample_new_network(Q, epsilon=0.3)   # TODO: update epsilon
+        # Calculate epsilon based on how many models we've trained
+        epsilon = get_epsilon(len(replay_buffer))
+
+        S, U = sample_new_network(Q, epsilon=epsilon)
         model = create_model(U)
         optimizer = get_optimizer(model)
         scheduler = get_scheduler(optimizer)
@@ -96,6 +99,9 @@ def update_Q_values(Q, S, U, accuracy):
     last_state = to_string(S[-1])
     last_action = to_string(U[-1])
 
+    if last_state not in Q:
+        Q[last_state] = {}
+    
     Q[last_state][last_action] = (1 - ALPHA) * Q.get(last_state, {}).get(last_action, INITIAL_Q_VALUE) + ALPHA * accuracy
 
     next_state = last_state
@@ -108,6 +114,9 @@ def update_Q_values(Q, S, U, accuracy):
         for next_action in Q[next_state]:   # TODO: not all actions will have been initialized ?
             best_action_value = max(best_action_value, Q[next_state][next_action])
 
+        if state not in Q:
+            Q[state] = {}
+        
         Q[state][action] = (1 - ALPHA) * Q.get(state, {}).get(action, INITIAL_Q_VALUE) + ALPHA * best_action_value
 
         next_state = state
@@ -115,5 +124,19 @@ def update_Q_values(Q, S, U, accuracy):
     return Q
 
 
+def get_epsilon(models_trained):
+    # Calculate epsilon based on how many models we've trained
+    i = 0
+    while i < len(EPSILON_SCHEDULER):
+        if models_trained < EPSILON_SCHEDULER[i]:
+            break
+
+        i += 1
+
+    epsilon = 1.0 - 0.1 * i
+
+    return epsilon
+
+
 if __name__ == "__main__":
-    q_learning(5)
+    q_learning(num_episodes=5)
