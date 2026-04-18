@@ -1,4 +1,8 @@
+import os
 import json
+import pickle
+from collections import deque
+
 from metaqnn.config.rl_config import *
 from metaqnn.config.train_config import *
 
@@ -123,7 +127,7 @@ def get_fully_connected_actions(num_consecutive, layer_depth, curr_num_neurons=N
     return fully_connected_actions
 
 
-def save_Q(Q, Q_file_path):
+def save_Q(Q, file_path):
     """
     Q looks like:
     dict {
@@ -143,23 +147,40 @@ def save_Q(Q, Q_file_path):
         ...
     }
     """
-    with open(Q_file_path, 'w') as file:
+    if not os.path.exists(file_path):
+        # If Q file path does not exist, return an empty one
+        return {}
+
+    with open(file_path, 'w') as file:
         json.dump(Q, file, indent=4)
 
 
-def load_Q(Q_file_path):
-    with open(Q_file_path) as file:
+def load_Q(file_path):
+    with open(file_path) as file:
         Q = json.load(file)
 
     return Q
 
 
-def save_buffer(replay_buffer):
-    pass
+def save_buffer(replay_buffer, file_path):
+    """Buffer is a deque with elements consisting of 
+    (state_sequence, action_sequence, accuracy)
+    ([None, "state1", "state2", ...], [action1, action2, ...], 70%)
+    """
+    with open(file_path, 'wb') as file:
+        pickle.dump(replay_buffer, file)
 
 
-def load_buffer():
-    pass
+
+def load_buffer(file_path):
+    if not os.path.exists(file_path):
+        # If buffer file path does not exist, return an empty one
+        return deque()
+
+    with open(file_path, 'rb') as file:
+        replay_buffer = pickle.load(file)
+
+        return replay_buffer
 
 
 def to_string(state):
@@ -184,3 +205,20 @@ if __name__ == "__main__":
     }
 
     save_Q(Q, 'metaqnn/saves/Q_values.json')
+
+    replay_buffer = deque()
+
+    replay_buffer.append((
+        [
+            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 3}",
+            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}"
+        ],
+        [
+            "{'layer_type': 'convolution', 'out_channels' : 16, 'kernel_size' : 5}",
+            "{'layer_type': 'termination'}"
+        ],
+        0.7
+    ))
+
+    save_buffer(replay_buffer, 'metaqnn/saves/replay_buffer.pkl')
+    loaded_buffer = load_buffer('metaqnn/saves/replay_buffer.pkl')
