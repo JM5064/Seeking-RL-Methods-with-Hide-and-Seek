@@ -1,6 +1,21 @@
 import random
-from metaqnn.rl_config import *
+from metaqnn.config.rl_config import *
 from metaqnn.state_actions import get_action_values, to_string
+
+
+def q_learning(num_episodes):
+    # init replay buffer
+    # init Q
+
+    for i in range(num_episodes):
+        # S, U = sample_new_network(epsilon=0.1, Q)
+        # accuracy = train(S)
+
+        # replay memory.append((S, U, accuracy))
+
+        pass
+
+    return
 
 
 def sample_new_network(epsilon, Q):

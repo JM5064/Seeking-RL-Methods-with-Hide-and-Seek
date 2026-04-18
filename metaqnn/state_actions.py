@@ -1,6 +1,6 @@
 import json
-from metaqnn.rl_config import *
-from metaqnn.train_config import *
+from metaqnn.config.rl_config import *
+from metaqnn.config.train_config import *
 
 
 def get_action_values(Q, state):
@@ -121,6 +121,42 @@ def get_fully_connected_actions(num_consecutive, layer_depth, curr_num_neurons=N
         })
 
     return fully_connected_actions
+
+
+def save_Q(Q):
+    """
+    Q looks like:
+    dict {
+        "{ 'layer_type' : 0, ... }" : 
+            {
+                "{ 'layer_type' : 0, ... }" : 0.5,
+                "{ 'layer_type' : 0, ... }" : 0.6,
+                "{ 'layer_type' : 0, ... }" : 0.3
+            }
+        ,
+        "{ 'layer_type' : 0, ... }" : 
+            {
+                "{ 'layer_type' : 0, ... }" : 0.5,
+                "{ 'layer_type' : 0, ... }" : 0.6,
+                "{ 'layer_type' : 0, ... }" : 0.3
+            }
+        ...
+    }
+    """
+    with open('Q_values.json', 'w') as file:
+        json.dump(Q, file)
+
+
+def load_Q():
+    pass
+
+
+def save_buffer(replay_buffer):
+    pass
+
+
+def load_buffer():
+    pass
 
 
 def to_string(state):

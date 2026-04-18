@@ -1,7 +1,7 @@
 import torch.nn as nn
 import math
 
-from metaqnn.rl_config import *
+from metaqnn.config.rl_config import *
 from metaqnn.layers.convolution import Convolution
 from metaqnn.layers.pooling import Pooling
 from metaqnn.layers.fully_connected import FullyConnected
@@ -30,7 +30,6 @@ class MetaQNN(nn.Module):
                     representation_size=current_resolution
                 )
                 current_channels = layer_config['out_channels']
-                current_resolution = (current_resolution - layer_config['kernel_size']) + 1
                 num_consecutive_fc_layers = 0
 
             elif layer_type == POOLING:
