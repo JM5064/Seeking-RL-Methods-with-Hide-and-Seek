@@ -1,4 +1,5 @@
 GAMMA = 1.0
+ALPHA = 0.01
 INITIAL_Q_VALUE = 0.5
 
 # Maximum number of layers
