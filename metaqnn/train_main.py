@@ -38,9 +38,12 @@ def main():
 
 
     layer_configs = [
-        { 'layer_type': CONVOLUTION, 'out_channels' : 64, 'kernel_size' : 3, 'layer_depth': 1, 'representation_size': 32},
-        { 'layer_type': CONVOLUTION, 'out_channels' : 64, 'kernel_size' : 3, 'layer_depth': 2, 'representation_size': 32},
-        { 'layer_type': TERMINATION }
+        {'layer_type': 0, 'out_channels': 256, 'kernel_size': 3, 'layer_depth': 1, 'representation_size': 32},
+        {'layer_type': 1, 'kernel_size': 5, 'stride': 3, 'layer_depth': 2, 'representation_size': 10},
+        {'layer_type': 0, 'out_channels': 64, 'kernel_size': 5, 'layer_depth': 3, 'representation_size': 10},
+        {'layer_type': 0, 'out_channels': 128, 'kernel_size': 5, 'layer_depth': 4, 'representation_size': 10},
+        {'layer_type': 1, 'kernel_size': 2, 'stride': 2, 'layer_depth': 5, 'representation_size': 5},
+        {'layer_type': 3}
     ]
     model = MetaQNN(layer_configs=layer_configs, input_size=32, input_channels=3)
     model = model.to(DEVICE)

@@ -1,6 +1,7 @@
 metaqnn/dataset
 metaqnn/saves
 */logs
+*/old
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

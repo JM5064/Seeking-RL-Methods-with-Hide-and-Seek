@@ -16,7 +16,7 @@ buffer_file_path = 'metaqnn/saves/replay_buffer.pkl'
 log_json_path = 'metaqnn/logs/logs.json'
 
 
-def q_learning(num_episodes):
+def q_learning(num_episodes, start_episode=0):
     # Initialize Q and replay buffer
     Q = load_Q(Q_file_path)
     replay_buffer = load_buffer(buffer_file_path)
@@ -26,7 +26,7 @@ def q_learning(num_episodes):
 
     print("Initialized Q, replay buffer, and datasets")
 
-    for _ in range(num_episodes):
+    for episode in range(start_episode, num_episodes):
         # Calculate epsilon based on how many models we've trained
         epsilon = get_epsilon(len(replay_buffer))
 
@@ -35,7 +35,7 @@ def q_learning(num_episodes):
         optimizer = get_optimizer(model)
         scheduler = get_scheduler(optimizer)
 
-        print("Sampled network:")
+        print(f"Sampled network #{episode+1}")
         for layer in U:
             print(layer)
 
@@ -47,7 +47,7 @@ def q_learning(num_episodes):
         replay_buffer.append((S, U, accuracy))
         save_model_metrics(U, epsilon, accuracy, log_json_path)
 
-        for _ in range(REPLAY_NUMBER):
+        for _ in range(min(len(replay_buffer) * 10, REPLAY_NUMBER)):
             # Sample from replay buffer
             S_sample, U_sample, accuracy_sample = random.choice(replay_buffer)
 
@@ -142,4 +142,5 @@ def get_epsilon(models_trained):
 
 
 if __name__ == "__main__":
-    q_learning(num_episodes=270)
+    buffer = load_buffer(buffer_file_path)
+    q_learning(num_episodes=270, start_episode=len(buffer))

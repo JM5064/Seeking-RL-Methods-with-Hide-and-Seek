@@ -134,6 +134,7 @@ def get_fully_connected_actions(num_consecutive, layer_depth, representation_siz
             'num_neurons' : num_neurons, 
             'num_consecutive' : num_consecutive + 1,
             'layer_depth' : layer_depth + 1,
+            'representation_size' : 1
         })
 
     return fully_connected_actions

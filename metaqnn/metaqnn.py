@@ -72,6 +72,7 @@ class MetaQNN(nn.Module):
 
             self.layers.append(layer)
 
+            # Add dropout
             if i % 2 == 1 and layer_type != TERMINATION:
                 num_dropouts += 1
                 dropout_prob = num_dropouts / (2 * n)
