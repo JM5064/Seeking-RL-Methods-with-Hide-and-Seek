@@ -8,12 +8,12 @@ from metaqnn.state_actions import get_possible_actions, get_action_values, to_st
 from metaqnn.state_actions import load_Q, save_Q, load_buffer, save_buffer
 
 from metaqnn.train import train, initialize_datasets, create_model, get_optimizer, get_scheduler
-from metaqnn.logging import save_accuracy
+from metaqnn.logging import save_model_metrics
 
 
 Q_file_path = 'metaqnn/saves/Q_values.json'
 buffer_file_path = 'metaqnn/saves/replay_buffer.pkl'
-accuracy_log_path = 'metaqnn/accuracy.csv'
+log_json_path = 'metaqnn/logs/logs.json'
 
 
 def q_learning(num_episodes):
@@ -45,7 +45,7 @@ def q_learning(num_episodes):
         )
 
         replay_buffer.append((S, U, accuracy))
-        save_accuracy(epsilon, accuracy, accuracy_log_path)
+        save_model_metrics(U, epsilon, accuracy, log_json_path)
 
         for _ in range(REPLAY_NUMBER):
             # Sample from replay buffer
