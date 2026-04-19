@@ -100,7 +100,7 @@ def initialize_datasets():
 
 def create_model(action_sequence):
     # Start from 1 to ignore the 'None' initial state
-    model = MetaQNN(layer_configs=action_sequence[1:], input_size=IMAGE_SIZE, input_channels=3)
+    model = MetaQNN(layer_configs=action_sequence, input_size=IMAGE_SIZE, input_channels=3)
     model = model.to(DEVICE)
 
     return model

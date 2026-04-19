@@ -39,7 +39,7 @@ def get_action_values(Q, state):
     elif layer_type == POOLING:
         # Pooling layers can go to convolution, FC, or terminal
         possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
-        possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
+        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, num_consecutive=0))
         possible_actions.append({ 'layer_type' : TERMINATION })
 
     elif layer_type == FULLY_CONNECTED:
