@@ -19,7 +19,10 @@ class MetaQNN(nn.Module):
         representation_size = input_size
         num_consecutive_fc_layers = 0
 
-        for layer_config in layer_configs:
+        n = (len(layer_configs) - 1) // 2
+        num_dropouts = 0
+
+        for i, layer_config in enumerate(layer_configs):
             layer_type = layer_config['layer_type']
             if layer_type == CONVOLUTION:
                 layer = Convolution(
@@ -68,6 +71,11 @@ class MetaQNN(nn.Module):
 
 
             self.layers.append(layer)
+
+            if i % 2 == 1 and layer_type != TERMINATION:
+                num_dropouts += 1
+                dropout_prob = num_dropouts / (2 * n)
+                self.layers.append(nn.Dropout(dropout_prob))
 
 
     def forward(self, x):
