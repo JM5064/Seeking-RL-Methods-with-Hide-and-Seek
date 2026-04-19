@@ -8,10 +8,13 @@ from metaqnn.state_actions import get_action_values, to_string, parse_state
 from metaqnn.state_actions import load_Q, save_Q, load_buffer, save_buffer
 
 from metaqnn.train import train, initialize_datasets, create_model, get_optimizer, get_scheduler
+from metaqnn.logging import save_accuracy
 
 
 Q_file_path = 'metaqnn/saves/Q_values.json'
 buffer_file_path = 'metaqnn/saves/replay_buffer.pkl'
+accuracy_log_path = 'metaqnn/accuracy.csv'
+
 
 def q_learning(num_episodes):
     # Initialize Q and replay buffer
@@ -42,6 +45,7 @@ def q_learning(num_episodes):
         )
 
         replay_buffer.append((S, U, accuracy))
+        save_accuracy(epsilon, accuracy, accuracy_log_path)
 
         for _ in range(REPLAY_NUMBER):
             # Sample from replay buffer
@@ -66,17 +70,10 @@ def sample_new_network(Q, epsilon):
         if rand > epsilon:
             # Take the greedy action
             possible_actions, action_values = get_action_values(Q, state_sequence[-1])
-
-            # TODO: make this faster
-            # TODO: make it pick a random one if tie
-            best_action = None
-            best_action_value = 0
-            for i in range(len(possible_actions)):
-                if action_values[i] > best_action_value:
-                    best_action = possible_actions[i]
-                    best_action_value = action_values[i]
-
-            next_layer = best_action
+            
+            max_val = max(action_values)
+            best_actions = [a for a, v in zip(possible_actions, action_values) if v == max_val]
+            next_layer = random.choice(best_actions)
 
         else:
             # Take a random action
@@ -139,4 +136,4 @@ def get_epsilon(models_trained):
 
 
 if __name__ == "__main__":
-    q_learning(num_episodes=5)
+    q_learning(num_episodes=270)
