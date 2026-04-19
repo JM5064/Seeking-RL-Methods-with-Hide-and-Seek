@@ -27,24 +27,29 @@ def get_possible_actions(state):
         # If initial state, go to convolution, pooling, or FC
         possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
         possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
-        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, num_consecutive=0))
+        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, representation_size=state['representation_size'], num_consecutive=0))
 
     elif layer_type == CONVOLUTION:
         # Convolution layers can go to any layer
         possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
         possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
-        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, num_consecutive=0))
+        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, representation_size=state['representation_size'], num_consecutive=0))
         possible_actions.append({ 'layer_type' : TERMINATION })
 
     elif layer_type == POOLING:
         # Pooling layers can go to convolution, FC, or terminal
         possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
-        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, num_consecutive=0))
+        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, representation_size=state['representation_size'], num_consecutive=0))
         possible_actions.append({ 'layer_type' : TERMINATION })
 
     elif layer_type == FULLY_CONNECTED:
         # FC layers can go to FC or terminal
-        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, num_consecutive=state['num_consecutive'], curr_num_neurons=state['num_neurons']))
+        possible_actions.extend(get_fully_connected_actions(
+            layer_depth=layer_depth, 
+            num_consecutive=state['num_consecutive'], 
+            representation_size=state['representation_size'], 
+            curr_num_neurons=state['num_neurons'])
+        )
         possible_actions.append({ 'layer_type' : TERMINATION })
 
     else:
@@ -107,7 +112,7 @@ def get_pooling_actions(layer_depth, representation_size):
     return pooling_actions
 
 
-def get_fully_connected_actions(num_consecutive, layer_depth, curr_num_neurons=None):
+def get_fully_connected_actions(num_consecutive, layer_depth, representation_size, curr_num_neurons=None):
     # If already at max consecutive FC, no fully connected actions available
     if num_consecutive >= MAX_CONSECUTIVE_FC:
         return []
@@ -118,6 +123,10 @@ def get_fully_connected_actions(num_consecutive, layer_depth, curr_num_neurons=N
     for num_neurons in AVAIL_NUM_NEURONS:
         # Only allow neurons <= number of current neurons
         if curr_num_neurons and num_neurons > curr_num_neurons:
+            continue
+        
+        # Only allow transitions to FC if representation_size <= 8
+        if representation_size > 8:
             continue
 
         fully_connected_actions.append({ 
@@ -198,4 +207,9 @@ if __name__ == "__main__":
     loaded_Q = load_Q('metaqnn/saves/Q_values.json')
     loaded_buffer = load_buffer('metaqnn/saves/replay_buffer.pkl')
 
-    print(loaded_Q)
+    # print(loaded_Q)
+
+    state = {'layer_type': 0, 'out_channels': 64, 'kernel_size': 5, 'layer_depth': 3, 'representation_size': 7}
+    possible_actions = get_possible_actions(state)
+    for action in possible_actions:
+        print(action)
