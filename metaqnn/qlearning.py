@@ -143,4 +143,4 @@ def get_epsilon(models_trained):
 
 if __name__ == "__main__":
     buffer = load_buffer(buffer_file_path)
-    q_learning(num_episodes=270, start_episode=len(buffer))
+    q_learning(num_episodes=300, start_episode=len(buffer))
