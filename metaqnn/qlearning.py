@@ -4,7 +4,7 @@ import torch.nn as nn
 from metaqnn.config.rl_config import *
 from metaqnn.config.train_config import *
 
-from metaqnn.state_actions import get_action_values, to_string, parse_state
+from metaqnn.state_actions import get_possible_actions, get_action_values, to_string, parse_state
 from metaqnn.state_actions import load_Q, save_Q, load_buffer, save_buffer
 
 from metaqnn.train import train, initialize_datasets, create_model, get_optimizer, get_scheduler
@@ -69,7 +69,8 @@ def sample_new_network(Q, epsilon):
 
         if rand > epsilon:
             # Take the greedy action
-            possible_actions, action_values = get_action_values(Q, state_sequence[-1])
+            possible_actions = get_possible_actions(state_sequence[-1])
+            action_values = get_action_values(Q, state_sequence[-1], possible_actions)
             
             max_val = max(action_values)
             best_actions = [a for a, v in zip(possible_actions, action_values) if v == max_val]
@@ -77,7 +78,7 @@ def sample_new_network(Q, epsilon):
 
         else:
             # Take a random action
-            possible_actions, _ = get_action_values(Q, state_sequence[-1])
+            possible_actions = get_possible_actions(state_sequence[-1])
             rand_action = random.randint(0, len(possible_actions)-1)
 
             next_layer = possible_actions[rand_action]
@@ -93,30 +94,35 @@ def sample_new_network(Q, epsilon):
 
 
 def update_Q_values(Q, S, U, accuracy):
-    last_state = to_string(S[-1])
-    last_action = to_string(U[-1])
+    target = accuracy
 
-    if last_state not in Q:
-        Q[last_state] = {}
-    
-    Q[last_state][last_action] = (1 - ALPHA) * Q.get(last_state, {}).get(last_action, INITIAL_Q_VALUE) + ALPHA * accuracy
-
-    next_state = last_state
-    for i in range(len(S) - 2, -1, -1):
+    for i in range(len(S) - 1, -1, -1):
         state = to_string(S[i])
         action = to_string(U[i])
 
-        # Find best action for next state
-        best_action_value = 0
-        for next_action in Q[next_state]:   # TODO: not all actions will have been initialized ?
-            best_action_value = max(best_action_value, Q[next_state][next_action])
-
         if state not in Q:
             Q[state] = {}
-        
-        Q[state][action] = (1 - ALPHA) * Q.get(state, {}).get(action, INITIAL_Q_VALUE) + ALPHA * best_action_value
 
-        next_state = state
+        # Update Q value
+        Q[state][action] = (1 - ALPHA) * Q[state].get(action, INITIAL_Q_VALUE) + ALPHA * target
+
+        # Update target to be best action value
+        possible_actions = get_possible_actions(S[i])
+
+        # Get all explored actions for the state
+        explored_actions = Q[state].keys()
+
+        # Check if all possible actions are fully explored
+        fully_explored = all(to_string(a) in explored_actions for a in possible_actions)
+
+        # Calculate max action value observed so far
+        max_observed = max(Q[state].values()) if Q[state] else INITIAL_Q_VALUE
+        
+        # If we haven't explored all actions, best action should be at least the INITIAL_Q_VALUE
+        if not fully_explored:
+            target = max(INITIAL_Q_VALUE, max_observed)
+        else:
+            target = max_observed
 
     return Q
 

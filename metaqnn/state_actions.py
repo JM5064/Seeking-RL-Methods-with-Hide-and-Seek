@@ -7,8 +7,8 @@ from metaqnn.config.rl_config import *
 from metaqnn.config.train_config import *
 
 
-def get_action_values(Q, state):
-    """Gets all actions for a given state and their associated values"""
+def get_possible_actions(state):
+    """Gets all actions for a given state"""
 
     possible_actions = []
 
@@ -50,15 +50,20 @@ def get_action_values(Q, state):
     else:
         print("should not happen prolly unless we decide to implement GAP")
 
+    return possible_actions
+
+
+def get_action_values(Q, state, actions):
+    """Gets the action values for a list of actions of a given state"""
     # Get action values for each state-action pair (or default if not yet explored)
     state_string = to_string(state)
     action_values = [
         # Get action value by converting state to string
         Q.get(state_string, {}).get(to_string(action), INITIAL_Q_VALUE)
-        for action in possible_actions
+        for action in actions
     ]
 
-    return possible_actions, action_values
+    return action_values
 
 
 def get_convolution_actions(layer_depth, representation_size):
