@@ -37,7 +37,9 @@ def validate(model, val_loader):
     return accuracy
 
 
-def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, scheduler):
+def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, scheduler, test_loader=None, val_on=False, save_folder=None):
+    best_accuracy = 0.0
+
     # Training loop
     for epoch in range(num_epochs):
         model.train()
@@ -54,11 +56,17 @@ def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, sch
             optimizer.step()
 
         # Evaluate model on first epoch
-        if epoch == 0:
+        if epoch == 0 or val_on:
             accuracy = validate(model, val_loader)
 
+            if save_folder:
+                if accuracy > best_accuracy:
+                    torch.save(model.state_dict(), save_folder + "/best.pt")
+                    best_accuracy = accuracy
+
+                torch.save(model.state_dict(), save_folder + "/last.pt")
+
             # Model is similar to random chance
-            # TODO: restart it a few times if this happens
             if accuracy <= 0.15:
                 return accuracy
 
@@ -69,6 +77,10 @@ def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, sch
 
     # Evaluate model
     accuracy = validate(model, val_loader)
+
+    if test_loader:
+        print("Testing model")
+        validate(model, test_loader)
 
     return accuracy
 
