@@ -11,8 +11,8 @@ from metaqnn.train import train, initialize_datasets, create_model, get_optimize
 from metaqnn.logging import save_model_metrics
 
 
-Q_file_path = 'metaqnn/saves/Q_values.json'
-buffer_file_path = 'metaqnn/saves/replay_buffer.pkl'
+Q_file_path = 'metaqnn/logs/Q_values.json'
+buffer_file_path = 'metaqnn/logs/replay_buffer.pkl'
 log_json_path = 'metaqnn/logs/logs.json'
 
 
@@ -35,7 +35,7 @@ def q_learning(num_episodes, start_episode=0):
         optimizer = get_optimizer(model)
         scheduler = get_scheduler(optimizer)
 
-        print(f"Sampled network #{episode+1}")
+        print(f"Sampled network #{episode+1} | Epsilon {epsilon}")
         for layer in U:
             print(layer)
 

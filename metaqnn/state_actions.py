@@ -24,10 +24,9 @@ def get_possible_actions(state):
         possible_actions.append({ 'layer_type' : TERMINATION })
 
     elif layer_type is None:
-        # If initial state, go to convolution, pooling, or FC
+        # If initial state, go to convolution or pooling
         possible_actions.extend(get_convolution_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
         possible_actions.extend(get_pooling_actions(layer_depth=layer_depth, representation_size=state['representation_size']))
-        possible_actions.extend(get_fully_connected_actions(layer_depth=layer_depth, representation_size=state['representation_size'], num_consecutive=0))
 
     elif layer_type == CONVOLUTION:
         # Convolution layers can go to any layer

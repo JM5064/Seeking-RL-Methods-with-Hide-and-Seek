@@ -40,9 +40,8 @@ def validate(model, val_loader):
 def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, scheduler):
     # Training loop
     for epoch in range(num_epochs):
-        print(f"Epoch {epoch+1}")
         model.train()
-        for inputs, labels in tqdm(train_loader):
+        for inputs, labels in tqdm(train_loader, desc=f'Epoch {epoch+1}'):
             inputs = inputs.to(DEVICE)
             labels = labels.to(DEVICE)
 
