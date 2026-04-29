@@ -210,3 +210,29 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+
+
+# --- Unity Folders to Ignore ---
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Vv]env/
+/[Aa]ssets/ML-Agents/
+
+# --- Python / ML stuff ---
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+logs/
+
+# --- IDE / OS files ---
+[Uu]serSettings/
+*.csproj
+*.sln
+*.user
+*.unitypackage
+.DS_Store
+Thumbs.db
