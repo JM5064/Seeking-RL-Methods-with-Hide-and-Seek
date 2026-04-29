@@ -37,11 +37,11 @@ def validate(model, val_loader):
     return accuracy
 
 
-def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, scheduler, test_loader=None, val_on=False, save_folder=None):
+def train(model, start_epoch, num_epochs, train_loader, val_loader, loss_func, optimizer, scheduler, test_loader=None, val_on=False, save_folder=None):
     best_accuracy = 0.0
 
     # Training loop
-    for epoch in range(num_epochs):
+    for epoch in range(start_epoch, num_epochs):
         model.train()
         for inputs, labels in tqdm(train_loader, desc=f'Epoch {epoch+1}'):
             inputs = inputs.to(DEVICE)
@@ -60,11 +60,18 @@ def train(model, num_epochs, train_loader, val_loader, loss_func, optimizer, sch
             accuracy = validate(model, val_loader)
 
             if save_folder:
+                checkpoint = {
+                    'epoch': epoch + 1,
+                    'state_dict': model.state_dict(),
+                    'optimizer': optimizer.state_dict(),
+                    'scheduler': scheduler.state_dict()
+                }
+
                 if accuracy > best_accuracy:
-                    torch.save(model.state_dict(), save_folder + "/best.pt")
+                    torch.save(checkpoint, save_folder + "/best.pt")
                     best_accuracy = accuracy
 
-                torch.save(model.state_dict(), save_folder + "/last.pt")
+                torch.save(checkpoint, save_folder + "/last.pt")
 
             # Model is similar to random chance
             if accuracy <= 0.15:

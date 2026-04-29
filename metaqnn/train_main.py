@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 import torchvision
 from metaqnn.dataset.cifar10 import CIFAR10
 
-from metaqnn.train import train
+from metaqnn.train import train, validate
 from metaqnn.metaqnn import MetaQNN
 from metaqnn.config.rl_config import *
 from metaqnn.config.train_config import DEVICE
@@ -61,13 +61,13 @@ def main():
 
 
     layer_configs = [
-        {'layer_type': 0, 'out_channels': 256, 'kernel_size': 3, 'layer_depth': 1, 'representation_size': 32}, 
-        {'layer_type': 0, 'out_channels': 128, 'kernel_size': 3, 'layer_depth': 2, 'representation_size': 32}, 
-        {'layer_type': 1, 'kernel_size': 5, 'stride': 3, 'layer_depth': 3, 'representation_size': 10}, 
-        {'layer_type': 0, 'out_channels': 128, 'kernel_size': 1, 'layer_depth': 4, 'representation_size': 10}, 
-        {'layer_type': 0, 'out_channels': 128, 'kernel_size': 3, 'layer_depth': 5, 'representation_size': 10}, 
-        {'layer_type': 0, 'out_channels': 64, 'kernel_size': 3, 'layer_depth': 6, 'representation_size': 10}, 
-        {'layer_type': 1, 'kernel_size': 3, 'stride': 2, 'layer_depth': 7, 'representation_size': 4}, 
+        {'layer_type': 0, 'out_channels': 256, 'kernel_size': 3, 'layer_depth': 1, 'representation_size': 32},
+        {'layer_type': 0, 'out_channels': 256, 'kernel_size': 5, 'layer_depth': 2, 'representation_size': 32},
+        {'layer_type': 1, 'kernel_size': 2, 'stride': 2, 'layer_depth': 3, 'representation_size': 16},
+        {'layer_type': 0, 'out_channels': 256, 'kernel_size': 3, 'layer_depth': 4, 'representation_size': 16},
+        {'layer_type': 0, 'out_channels': 256, 'kernel_size': 5, 'layer_depth': 5, 'representation_size': 16},
+        {'layer_type': 1, 'kernel_size': 3, 'stride': 2, 'layer_depth': 6, 'representation_size': 7},
+        {'layer_type': 0, 'out_channels': 64, 'kernel_size': 1, 'layer_depth': 7, 'representation_size': 7},
         {'layer_type': 3}
     ]
 
@@ -85,11 +85,22 @@ def main():
     total_epochs = 50
     scheduler = convnext_scheduler(optimizer, 5, total_epochs)
 
+    def load_checkpoint(checkpoint_path, model, optimizer, scheduler):
+        checkpoint = torch.load(checkpoint_path, map_location='cpu')
 
-    train(model=model, num_epochs=total_epochs, train_loader=train_loader, val_loader=val_loader, 
+        model.load_state_dict(checkpoint['state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
+        scheduler.load_state_dict(checkpoint['scheduler'])
+
+        return model, optimizer, scheduler, checkpoint['epoch']
+    
+    # model, optimizer, scheduler, epoch = load_checkpoint("metaqnn/logs/0.8098/last.pt", model, optimizer, scheduler)
+
+
+    train(model=model, start_epoch=0, num_epochs=total_epochs, train_loader=train_loader, val_loader=val_loader, 
           loss_func=nn.CrossEntropyLoss(), optimizer=optimizer, scheduler=scheduler, 
-          test_loader=test_loader, val_on=True, save_folder='metaqnn/logs/0.812')
-
+          test_loader=test_loader, val_on=True, save_folder='metaqnn/logs/0.8098')
+    
 
 if __name__ == "__main__":
     main()

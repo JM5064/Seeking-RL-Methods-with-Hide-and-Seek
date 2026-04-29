@@ -1,4 +1,6 @@
 import json
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def find_top_k(log_file_path, k=5):
@@ -11,18 +13,14 @@ def find_top_k(log_file_path, k=5):
     return log[:k]
 
 
-def get_rolling_mean(log_file_path):
+def get_rolling_means(log_file_path, average_over=4):
     # open file
     with open(log_file_path) as file:
         log = json.load(file)
 
-    # Initialize with first accuracy value
-    rolling_means = [log[0][2]]
+    accuracies = [accuracy for _, _, accuracy in log]
 
-    for i in range(1, len(log)):
-        _, _, accuracy = log[i]
-
-        rolling_means.append((rolling_means[-1] * len(rolling_means) + accuracy) / (len(rolling_means) + 1))
+    rolling_means = np.convolve(accuracies, np.ones(average_over)/average_over, mode='valid')
 
     return rolling_means
 
@@ -45,6 +43,60 @@ def get_average_accuracy_per_epsilon(log_file_path, epsilon):
     return sum_accuracy / total_epsilon
 
 
+def plot_q_learning_performance(log_file_path):
+    # open file
+    with open(log_file_path) as file:
+        log = json.load(file)
+
+    n = len(log)
+    epsilons = [epsilon for _, epsilon, _ in log]
+
+    # Find epsilon change points
+    change_points = [0]
+    for i in range(1, n):
+        if epsilons[i] != epsilons[i-1]:
+            change_points.append(i)
+    change_points.append(n)
+
+    plt.figure(figsize=(8, 6))
+
+    # Plot epsilon averages
+    for i in range(len(change_points) - 1):
+        start = change_points[i]
+        end = change_points[i+1]
+        epsilon = epsilons[start]
+
+        average_accuracy = get_average_accuracy_per_epsilon(log_file_path, epsilon)
+
+        plt.fill_between(
+            range(start, end),
+            average_accuracy,
+            alpha=0.25,
+            color='tab:blue',
+            label="Average Accuracy Per Epsilon" if i == 0 else None
+        )
+
+        # Label epsilon
+        epsilon_text = str(epsilon)
+        if start == 0:
+            epsilon_text = "Epsilon = " + epsilon_text
+
+        plt.text(x=(start + end) // 2, y=0.02, s=epsilon_text, ha='center', fontsize=10)
+
+    # Plot rolling mean line
+    rolling_means = get_rolling_means(log_file_path)
+    plt.plot(rolling_means, label="Rolling Mean Model Accuracy")
+    plt.ylim(0, 1)
+
+    # Labels / title
+    plt.xlabel("Iterations")
+    plt.ylabel("Accuracy")
+    plt.title("Q-Learning Performance")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
     log_file_path = 'metaqnn/logs/logs.json'
 
@@ -52,13 +104,10 @@ if __name__ == "__main__":
 
     for model in top_k:
         architecture, epsilon, accuracy = model
-        print(architecture)
+        for layer in architecture:
+            print(layer)
         print(epsilon)
         print(accuracy)
         print()
 
-    rolling_means = get_rolling_mean(log_file_path)
-    print(rolling_means)
-
-    for e in [1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1]:
-        print(get_average_accuracy_per_epsilon(log_file_path, e))
+    plot_q_learning_performance(log_file_path)

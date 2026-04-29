@@ -8,7 +8,7 @@ from metaqnn.state_actions import get_possible_actions, get_action_values, to_st
 from metaqnn.state_actions import load_Q, save_Q, load_buffer, save_buffer
 
 from metaqnn.train import train, initialize_datasets, create_model, get_optimizer, get_scheduler
-from metaqnn.logging import save_model_metrics
+from metaqnn.log import save_model_metrics
 
 
 Q_file_path = 'metaqnn/logs/Q_values.json'
@@ -40,7 +40,7 @@ def q_learning(num_episodes, start_episode=0):
             print(layer)
 
         accuracy = train(
-            model, num_epochs=NUM_EPOCHS, train_loader=train_loader, val_loader=val_loader,
+            model, start_epoch=0, num_epochs=NUM_EPOCHS, train_loader=train_loader, val_loader=val_loader,
             loss_func=nn.CrossEntropyLoss(), optimizer=optimizer, scheduler=scheduler
         )
 
