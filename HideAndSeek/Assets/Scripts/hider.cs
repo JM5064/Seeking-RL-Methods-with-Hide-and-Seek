@@ -10,7 +10,13 @@ public class Hider : Agent
     public Seeker seeker;
     public float moveSpeed = 2f;
     public float turnSpeed = 180f;
-    public Rigidbody rigidbody;
+    public Rigidbody rigidbody;    
+
+    public Camera cam;
+
+    public int sensorWidth = 32;
+    public int sensorHeight = 32;
+    
     public override void OnEpisodeBegin()
     {
         transform.position = GetRandomPoint(Vector3.zero, 7f); 
@@ -19,8 +25,10 @@ public class Hider : Agent
         seeker.transform.LookAt(transform);
 
     }
+
     public override void OnActionReceived(ActionBuffers actions)
     {
+
         int moveAction = actions.DiscreteActions[0];
         Vector3 moveDir = Vector3.zero;
         float rotation = 0f;

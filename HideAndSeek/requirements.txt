@@ -1,10 +1,11 @@
-mlagents==1.1.0
-mlagents-envs==1.1.0
+# mlagents==1.1.0
+# mlagents-envs==1.1.0
+protobuf==6.31.1
 stable-baselines3[extra]==2.3.2
 shimmy>=0.2.1
 numpy<2.0.0
 Pillow>=10.0.0
-intel-openmp
+# intel-openmp
 torch>=2.2.0
 torchvision
-tensorboard
+# tensorboard
