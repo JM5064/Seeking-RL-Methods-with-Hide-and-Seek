@@ -3,6 +3,9 @@ metaqnn/saves
 */logs
 */old
 
+HideAndSeek/logs_Meta_QNN_model
+HideAndSeek/logs_base_model
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

@@ -14,7 +14,7 @@ import os
 def train(log_dir, model_architecture, model_name, features_dim):
     if th.cuda.is_available():
         device = th.device("cuda")
-        print("Using device: CUDA (Nvidia GPU)")
+        print("Using device: CUDA (Nvidia GP)")
     elif th.backends.mps.is_available() and th.backends.mps.is_built():
         device = th.device("mps")
         print("Using device: MPS (Apple Silicon GPU)")
@@ -25,7 +25,7 @@ def train(log_dir, model_architecture, model_name, features_dim):
     os.makedirs(log_dir, exist_ok=True)
 
     channel = EngineConfigurationChannel()
-    channel.set_configuration_parameters(time_scale=10)
+    channel.set_configuration_parameters(time_scale=5)
 
     print("Connecting to Unity...")
     unity_env = UnityEnvironment(side_channels=[channel], timeout_wait=120)
@@ -35,7 +35,7 @@ def train(log_dir, model_architecture, model_name, features_dim):
     env = Monitor(env, log_dir)
 
     checkpoint_callback = CheckpointCallback(
-        save_freq=1024,          
+        save_freq=2048,          
         save_path=log_dir,       
         name_prefix=model_name   
     )
@@ -60,7 +60,7 @@ def train(log_dir, model_architecture, model_name, features_dim):
         tensorboard_log=log_dir,
     )
 
-    model.learn(total_timesteps=5_000, callback=checkpoint_callback)
+    model.learn(total_timesteps=500_000, callback=checkpoint_callback)
     model.save("hider_policy_"+model_name)
     env.close()
     print("Environment closed.")  

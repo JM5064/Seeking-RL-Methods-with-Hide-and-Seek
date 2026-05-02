@@ -38,4 +38,3 @@ if __name__=='__main__':
     log_dir = f"./logs_{name}/"
     features_dim = 512
     train(log_dir, BaseCNN, name, features_dim)
-    load(name)

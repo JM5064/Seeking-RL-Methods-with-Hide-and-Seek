@@ -2,44 +2,39 @@
     "name": "root",
     "metadata": {
         "timer_format_version": "0.1.0",
-        "start_time_seconds": "1777544595",
+        "start_time_seconds": "1777685763",
         "python_version": "3.10.12 (main, Jul  5 2023, 15:02:25) [Clang 14.0.6 ]",
-        "command_line_arguments": "/opt/anaconda3/envs/hideandseek2/bin/mlagents-learn --force",
+        "command_line_arguments": "/opt/anaconda3/envs/hideandseek2/bin/mlagents-learn --force --inference",
         "mlagents_version": "1.1.0",
         "mlagents_envs_version": "1.1.0",
         "communication_protocol_version": "1.5.0",
         "pytorch_version": "2.11.0",
         "numpy_version": "1.23.5",
-        "end_time_seconds": "1777544608"
+        "end_time_seconds": "1777685788"
     },
-    "total": 13.111841041594744,
+    "total": 25.03385508293286,
     "count": 1,
-    "self": 0.021262499503791332,
+    "self": 0.02084841625764966,
     "children": {
         "run_training.setup": {
-            "total": 0.028663333971053362,
+            "total": 0.02227987488731742,
             "count": 1,
-            "self": 0.028663333971053362
+            "self": 0.02227987488731742
         },
         "TrainerController.start_learning": {
-            "total": 13.061915208119899,
+            "total": 24.990726791787893,
             "count": 1,
-            "self": 0.0011174571700394154,
+            "self": 0.007714248728007078,
             "children": {
                 "TrainerController._reset_env": {
-                    "total": 13.06077745789662,
+                    "total": 24.98301083408296,
                     "count": 1,
-                    "self": 13.06077745789662
+                    "self": 24.98301083408296
                 },
                 "trainer_threads": {
-                    "total": 2.083834260702133e-06,
+                    "total": 1.708976924419403e-06,
                     "count": 1,
-                    "self": 2.083834260702133e-06
-                },
-                "TrainerController._save_models": {
-                    "total": 1.8209218978881836e-05,
-                    "count": 1,
-                    "self": 1.8209218978881836e-05
+                    "self": 1.708976924419403e-06
                 }
             }
         }

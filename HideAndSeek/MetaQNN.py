@@ -2,7 +2,6 @@ import torch as th
 import torch.nn as nn
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from train_Hider import train
-from load_model import load
 
 
 class MetaQNN(BaseFeaturesExtractor):
@@ -35,4 +34,4 @@ if __name__=='__main__':
     log_dir = f"./logs_{name}/"
     features_dim = 1024
     train(log_dir, MetaQNN, name, features_dim)
-    load(name)
+
